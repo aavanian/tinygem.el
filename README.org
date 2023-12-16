@@ -1,0 +1,55 @@
+#+TITLE: tinygem.el
+#+PROPERTY: LOGGING nil
+
+This package provides a function to push an url from emacs to [[TinyGem.org]] plus a few others convenience tools to call it from elfeed, etc...
+
+* Contents                                                         :noexport:
+:PROPERTIES:
+:TOC:      this
+:ID:       2EF1E4CE-F14E-4F63-B741-2AB62ACC49C9
+:END:
+  -  [[#installation][Installation]]
+  -  [[#usage][Usage]]
+  -  [[#changelog][Changelog]]
+
+* Installation
+:PROPERTIES:
+:TOC:      0
+:END:
+
+** Quelpa or Straight.el
+
+#+BEGIN_src elisp
+  (use-package tinygem
+    :quelpa (tinygem :fetcher github :repo "aavanian/tinygem.el"))
+#+END_src
+
+#+begin_src elisp
+  (use-package tinygem
+    :straight (:host github :repo "aavanian/tinygem.el" :branch "main"))
+#+end_src
+
+** Manual
+
+Put =tinygem.el= in your =load-path=, and this in your init file:
+
+#+BEGIN_src elisp
+  (require 'tinygem)
+#+END_src
+
+* Usage
+:PROPERTIES:
+:TOC:      0
+:END:
+
+* Changelog
+:PROPERTIES:
+:TOC:      0
+:END:
+
+* License
+:PROPERTIES:
+:TOC:      ignore
+:END:
+
+GPLv3
