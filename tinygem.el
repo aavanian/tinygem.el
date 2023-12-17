@@ -35,10 +35,10 @@
 
 ;;; Code:
 
-(require 'request)
+(require 'plz)
 
 ;; --- customs / variables ---------------------------------------------------
-(defcustom tinygem/token-source 'auth-source
+(defcustom tinygem-token-source 'auth-source
   "Source of the token for the HTTP request.
 Can be a string (the token itself) or the symbol 'auth-source
 (which means it should use the auth-source package to find the token)."
@@ -46,7 +46,7 @@ Can be a string (the token itself) or the symbol 'auth-source
                  (const :tag "Use auth-source package" auth-source))
   :group 'tinygem)
 
-(defcustom tinygem/user nil
+(defcustom tinygem-user nil
   "TinyGem user to search for in auth-source. If nil, it will use the first
 entry for tinygem.org."
   :type '(choice (nil :tag "First entry")
@@ -54,15 +54,15 @@ entry for tinygem.org."
   :group 'tinygem)
 
 ;; --- helpers ---------------------------------------------------------------
-(defun tinygem/get-token (&optional host user)
-  "Get the token depending on the value of 'tinygem/token-source'.
-If 'tinygem/token-source' is a string, return that string.
-If 'tinygem/token-source' is the symbol 'auth-source', search auth-source
+(defun tinygem-get-token (&optional host user)
+  "Get the token depending on the value of 'tinygem-token-source'.
+If 'tinygem-token-source' is a string, return that string.
+If 'tinygem-token-source' is the symbol 'auth-source', search auth-source
 for the optional arguments HOST and USER and return the secret.
 Return an error if it can't find an entry or finds several."
   (cond
-   ((stringp tinygem/token-source) tinygem/token-source)
-   ((eq tinygem/token-source 'auth-source)
+   ((stringp tinygem-token-source) tinygem-token-source)
+   ((eq tinygem-token-source 'auth-source)
     (let* ((host (or host "tinygem.org"))
            (user (or user t))
            (found (auth-source-search :host host :user user :max 1)))
@@ -72,7 +72,21 @@ Return an error if it can't find an entry or finds several."
                 (error "Found auth-source entry, but it has no secret")))
         (error "No auth-source entry found for host %s and user %s" host user))))
    (t
-    (error "Invalid token source: %s" tinygem/token-source))))
+    (error "Invalid token source: %s" tinygem-token-source))))
+
+(defun parse-url-retrieve ()
+  "Parse the buffer returned by `url-retrieve' and return the
+status code and body."
+  (goto-char (point-min))
+  (let (status-code message)
+    (when (re-search-forward
+           "^HTTP/\\(1\\.0\\|1\\.1\\|2\\) \\([0-9]+\\) \\(.*\\)$" nil t)
+      (setq status-code (string-to-number (match-string 2))))
+    (goto-char url-http-end-of-headers)
+    ;; (previous-line)
+    (right-char)
+    (setq message (buffer-substring-no-properties (point) (point-max))) 
+    (list status-code message)))
 
 ;; --- main functions-- ------------------------------------------------------
 
@@ -87,29 +101,33 @@ TITLE is a string.
 TAGS may be a string of comma-separated list of tags.
 
 NOTE may be a string."
-  (let* ((is_private (or is_private nil))
-         (data `(("apikey" . ,(tinygem/get-token))
-                 ("is_private" . ,(if is_private "true" "false"))
-                 ("url" . ,url)
-                 ("title" . ,title)))
-         (output))
-    (when tags
-      (setq data (cons data `("tags" . ,tags))))
-    (when note
-      (setq data (cons data `("note" . ,note))))
-    (request
-      "https://tinygem.org/api/create/"
-      :type "POST"
-      :data data
-      :parser 'json-read
-      :status-code
-      `((201 . ,(lambda (&rest _)
-                  (setq output (format "TinyGem successfully created for %s." url))))
-        (400 . ,(cl-function (lambda (&key data &key response &allow-other-keys)
-                               (message "Error 400: %s when trying to create TinyGem for %s." data url))))
-        (500 . ,(cl-function (lambda (&key data &allow-other-keys)
-                               (setq output (format "Error 500: %s when trying to create TinyGem for %s." data url))))))) output))
-
+  (pcase-let* ((url-request-method "POST")
+               (url-request-extra-headers
+                '(("Content-Type" .  "application/x-www-form-urlencoded")))
+               (is_private (or is_private nil))
+               (data `(("apikey" ,(tinygem-get-token))
+                       ("is_private" ,(if is_private "true" "false"))
+                       ("url" ,url)
+                       ("title" ,title)))
+               (data (if tags (cons data `("tags" ,tags)) data))
+               (data (if note (cons data `("note" ,note)) data))
+               (url-request-data (url-build-query-string data)))
+    (url-retrieve "https://tinygem.org/api/create" 
+                  (lambda (alist)
+                    (pcase-let
+                        ((`(,status-code ,resp) (parse-url-retrieve))
+                         (fdb (format "TinyGem for %s" url)))
+                      (cond ((eq status-code 201)
+                             (message (concat fdb " successfully created.")))
+                            ((eq status-code 400)
+                             (message (concat fdb (format
+                                                   " failed with error %s: %s."
+                                                   status-code resp))))
+                            (t
+                             (message (concat fdb (format
+                                                   ": unknown condition (%s, %s)"
+                                                   status-code resp))))))))))
+  
 (provide 'tinygem)
 
 ;;; tinygem.el ends here
