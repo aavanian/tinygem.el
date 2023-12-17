@@ -91,7 +91,7 @@ status code and body."
 ;; --- main functions-- ------------------------------------------------------
 
 ;;;###autoload
-(defun create-tinygem (url title &optional is_private tags note)
+(defun tinygem-create (url title &optional is_private tags note)
   "Create a TinyGem for URL.
 
 IS_PRIVATE may be t or nil.
