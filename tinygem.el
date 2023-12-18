@@ -109,8 +109,8 @@ NOTE may be a string."
                        ("is_private" ,(if is_private "true" "false"))
                        ("url" ,url)
                        ("title" ,title)))
-               (data (if tags (cons data `("tags" ,tags)) data))
-               (data (if note (cons data `("note" ,note)) data))
+               (data (if tags (append data `(("tags" ,tags))) data))
+               (data (if note (append data `(("note" ,note))) data))
                (url-request-data (url-build-query-string data)))
     (url-retrieve "https://tinygem.org/api/create" 
                   (lambda (alist)
@@ -123,11 +123,30 @@ NOTE may be a string."
                              (message (concat fdb (format
                                                    " failed with error %s: %s."
                                                    status-code resp))))
+                            ((eq status-code 500)
+                             (message (concat fdb (format
+                                                   " failed with error %s: %s (This is probably a bug in tinygem.el)."
+                                                   status-code resp))))
                             (t
                              (message (concat fdb (format
                                                    ": unknown condition (%s, %s)"
                                                    status-code resp))))))))))
-  
+
+;;;###autoload
+(defun tinygem-elfeed-search-create ()
+  "Create a TinyGem for the selected feed items."
+  (interactive)
+  (dolist (entry (elfeed-search-selected) nil)
+    (let* ((title (elfeed-entry-title entry))
+           (tags (mapconcat 'symbol-name (elfeed-entry-tags entry) ","))
+           (link (elfeed-entry-link entry)))
+      (message "title: %s | tags: %s | link: %s" title tags link)
+      (elfeed-untag entry 'unread)
+      (elfeed-search-update-entry entry)
+      (tinygem-create link title nil tags)))
+  (unless (or elfeed-search-remain-on-entry (use-region-p))
+    (forward-line)))
+
 (provide 'tinygem)
 
 ;;; tinygem.el ends here
