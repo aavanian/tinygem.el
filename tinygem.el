@@ -138,12 +138,12 @@ NOTE may be a string."
   (interactive)
   (dolist (entry (elfeed-search-selected) nil)
     (let* ((title (elfeed-entry-title entry))
-           (tags (mapconcat 'symbol-name (elfeed-entry-tags entry) ","))
+           (tags (mapconcat 'symbol-name (--remove (eq it 'unread) (elfeed-entry-tags entry)) ","))
            (link (elfeed-entry-link entry)))
       (when link
         (elfeed-untag entry 'unread)
-        (elfeed-search-update-entry entry)
-        (tinygem-create link title nil tags))))
+        (tinygem-create link title nil tags)
+        (elfeed-search-update-entry entry))))
   (unless (or elfeed-search-remain-on-entry (use-region-p))
     (forward-line)))
 
