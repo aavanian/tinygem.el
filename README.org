@@ -10,6 +10,7 @@ This package provides a function to push an url from emacs to [[TinyGem.org]] pl
 :END:
   -  [[#installation][Installation]]
   -  [[#usage][Usage]]
+  -  [[#Todos][Todos]]
   -  [[#changelog][Changelog]]
 
 * Installation
@@ -41,6 +42,12 @@ Put =tinygem.el= in your =load-path=, and this in your init file:
 :PROPERTIES:
 :TOC:      0
 :END:
+
+* Todos
+:PROPERTIES:
+:TOC: 0
+:END:
+- [ ] Utility function to call ~tinygem-create~ on an [[https://github.com/skeeto/elfeed][elfeed]] entry, either from the ~*elfeed-search*~ buffer or from an ~*elfeed-entry*~ buffer
 
 * Changelog
 :PROPERTIES:
