@@ -140,10 +140,10 @@ NOTE may be a string."
     (let* ((title (elfeed-entry-title entry))
            (tags (mapconcat 'symbol-name (elfeed-entry-tags entry) ","))
            (link (elfeed-entry-link entry)))
-      (message "title: %s | tags: %s | link: %s" title tags link)
-      (elfeed-untag entry 'unread)
-      (elfeed-search-update-entry entry)
-      (tinygem-create link title nil tags)))
+      (when link
+        (elfeed-untag entry 'unread)
+        (elfeed-search-update-entry entry)
+        (tinygem-create link title nil tags))))
   (unless (or elfeed-search-remain-on-entry (use-region-p))
     (forward-line)))
 
