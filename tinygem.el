@@ -147,6 +147,16 @@ NOTE may be a string."
   (unless (or elfeed-search-remain-on-entry (use-region-p))
     (forward-line)))
 
+;;;###autoload
+(defun tinygem-elfeed-show-create ()
+  "Create a TinyGem for the current entry link URL."
+  (interactive)
+  (let* ((title (elfeed-entry-title elfeed-show-entry))
+         (tags (mapconcat 'symbol-name (elfeed-entry-tags elfeed-show-entry) ","))
+         (link (elfeed-entry-link elfeed-show-entry)))
+   (when link
+     (tinygem-create link title nil tags))))
+
 (provide 'tinygem)
 
 ;;; tinygem.el ends here

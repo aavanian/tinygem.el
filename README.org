@@ -47,7 +47,7 @@ Put =tinygem.el= in your =load-path=, and this in your init file:
 :PROPERTIES:
 :TOC: 0
 :END:
-- [ ] Utility function to call ~tinygem-create~ on an [[https://github.com/skeeto/elfeed][elfeed]] entry, either from the ~*elfeed-search*~ buffer or from an ~*elfeed-entry*~ buffer
+- [X] Utility function to call ~tinygem-create~ on an [[https://github.com/skeeto/elfeed][elfeed]] entry, either from the ~*elfeed-search*~ buffer or from an ~*elfeed-entry*~ buffer
 
 * Changelog
 :PROPERTIES:
