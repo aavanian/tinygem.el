@@ -35,7 +35,7 @@
 
 ;;; Code:
 
-(require 'plz)
+(require 'dash)
 
 ;; --- customs / variables ---------------------------------------------------
 (defcustom tinygem-token-source 'auth-source
