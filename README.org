@@ -47,6 +47,7 @@ Put =tinygem.el= in your =load-path=, and this in your init file:
 :PROPERTIES:
 :TOC: 0
 :END:
+- [ ] Add ~url-rewrite~ and use it to clean urls from queries before creating the gem. This needs a custom variable to disable the behavior. I don't think we need host rewrites though
 - [X] Utility function to call ~tinygem-create~ on an [[https://github.com/skeeto/elfeed][elfeed]] entry, either from the ~*elfeed-search*~ buffer or from an ~*elfeed-entry*~ buffer
 
 * Changelog
