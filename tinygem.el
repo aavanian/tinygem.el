@@ -36,6 +36,7 @@
 ;;; Code:
 
 (require 'dash)
+(require 'url-rewrite)
 
 ;; --- customs / variables ---------------------------------------------------
 (defcustom tinygem-token-source 'auth-source
@@ -51,6 +52,12 @@ Can be a string (the token itself) or the symbol 'auth-source
 entry for tinygem.org."
   :type '(choice (nil :tag "First entry")
                  (string :tag "Username to search in auth-source"))
+  :group 'tinygem)
+
+(defcustom tinygem-url-clean-query t
+  "Whether the url will be clean from query parameters before being sent
+to TinyGem."
+  :type 'boolean
   :group 'tinygem)
 
 ;; --- helpers ---------------------------------------------------------------
@@ -105,6 +112,10 @@ NOTE may be a string."
                (url-request-extra-headers
                 '(("Content-Type" .  "application/x-www-form-urlencoded")))
                (is_private (or is_private nil))
+               (url (if tinygem-url-clean-query
+                        ;; TODO: hmmm url-rewrite seems incomplete, url-rw-remove-query return only a path and discard the protocol and host and everything else...
+                        (url-recreate-url (url-rw-remove-query (url-generic-parse-url "https://my.site.org/this/is/a/path?and=1&a=2&query=true") ".*"))
+                      url))
                (data `(("apikey" ,(tinygem-get-token))
                        ("is_private" ,(if is_private "true" "false"))
                        ("url" ,url)
