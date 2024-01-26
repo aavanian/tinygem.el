@@ -85,7 +85,7 @@ status code and body."
     (goto-char url-http-end-of-headers)
     ;; (previous-line)
     (right-char)
-    (setq message (buffer-substring-no-properties (point) (point-max))) 
+    (setq message (buffer-substring-no-properties (point) (point-max)))
     (list status-code message)))
 
 ;; --- main functions-- ------------------------------------------------------
@@ -112,7 +112,7 @@ NOTE may be a string."
                (data (if tags (append data `(("tags" ,tags))) data))
                (data (if note (append data `(("note" ,note))) data))
                (url-request-data (url-build-query-string data)))
-    (url-retrieve "https://tinygem.org/api/create" 
+    (url-retrieve "https://tinygem.org/api/create"
                   (lambda (alist)
                     (pcase-let
                         ((`(,status-code ,resp) (parse-url-retrieve))
@@ -154,9 +154,8 @@ NOTE may be a string."
   (let* ((title (elfeed-entry-title elfeed-show-entry))
          (tags (mapconcat 'symbol-name (elfeed-entry-tags elfeed-show-entry) ","))
          (link (elfeed-entry-link elfeed-show-entry)))
-   (when link
-     (tinygem-create link title nil tags))))
+    (when link
+      (tinygem-create link title nil tags))))
 
 (provide 'tinygem)
-
 ;;; tinygem.el ends here
